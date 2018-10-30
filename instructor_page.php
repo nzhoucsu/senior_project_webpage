@@ -21,8 +21,6 @@
 				<input type="text" name="fname" value="<?php echo $fname; ?>" required><br>
 				Last Name<br>
 				<input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
-				CSU ID<br>
-				<input type="text" name="csuid" value="<?php echo $csuid; ?>" required><br>
 				<!-- Input project operation -->
 				<h3>Project Operation</h3>
 				<input id="radio_add" type="radio" name="operation" value="add_pro" 
