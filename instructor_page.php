@@ -16,17 +16,11 @@
 			<form class="relative">
 				<!-- Input user information -->
 				First Name<br>
-				<textarea name="fname" rows="1" cols="30" 
-					      style="resize: none; font-size: 14px;"
-					      required></textarea><br>
+				<input type="text" name="fname" required><br>
 				Last Name<br>
-				<textarea name="lname" rows="1" cols="30" 
-					      style="resize: none; font-size: 14px;"
-					      required></textarea><br>
+				<input type="text" name="lname" required><br>
 				CSU ID<br>
-				<textarea name="csuid" rows="1" cols="30" 
-					      style="resize: none; font-size: 14px;"
-					      required></textarea><br>
+				<input type="text" name="csuid" required><br>
 				<!-- Input project operation -->
 				<h3>Project Operation</h3>
 				<input type="radio" name="operation" value="add_pro" checked
@@ -37,20 +31,19 @@
 				       onclick="del()"> Delet Project<br><br>
 				<div id="project_id" style="display: none;">
 					Project #<br>  
-					<textarea name="pro_id" rows="1" cols="30" 
-					          style="resize: none; font-size: 14px;"></textarea><br>
+					<input type="text" name="pro_id"><br>
 				</div>
 				<div id="project_title">
 					Title<br>
-					<textarea name="pro_title" rows="3" cols="30" 
-					          style="resize: none; font-size: 14px"></textarea><br>
+					<input type="text" name="pro_title"><br>
 				</div>
 				<div id="project_requirement">
 					Requirement<br>
-					<textarea name="pro_require" rows="5" cols="30" 
-				          style="resize: none; font-size: 14px"></textarea><br>
-				</div>			
-				<input type="submit" name="bn_sbmt" value="Submit">
+					<input type="text" name="pro_requr"><br>
+				</div>
+				<div style="position: relative; top: 10px">
+					<input type="submit" name="bn_sbmt" value="Submit">
+				</div>					
 			</form>	
 		</div>			
 	</div>
