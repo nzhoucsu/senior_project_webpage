@@ -70,11 +70,11 @@ function modify_project($modf_pro_id, $modf_pro_title,
 }
 
 
-function delete_project($del_pro_id){
+function delete_project($db_conn, $del_pro_id){
 	global $errors, $pro_array;
 	$table_name = "project";
 	$error_flag = 0;
-	// Delete project(s).
+	// Analyze deleted items.
 	$pro_array = explode(",", $del_pro_id);	
 	$a = array();
 	foreach ($pro_array as $pro_item) {
@@ -86,14 +86,28 @@ function delete_project($del_pro_id){
 			array_push($a, intval($pro_item));
 		}
 	}
+	// Acquire unique deleted items.
 	$a = array_unique($a);
-	rsort($a);
 	foreach ($a as $item) {
-		$sql = "DELETE FROM {$table_name} WHERE pro_id={$item}";
+		// Check if project $item is in system.
+		$sql = "SELECT COUNT(*) AS count FROM {$table_name} WHERE pro_id=$item";
 		$results = mysqli_query($db_conn, $sql);
 		if (!$results) {
 			array_push($errors, "Failed to delete project {$item}.");
+			return -1;
+		}
+		$row=mysqli_fetch_assoc($results);
+		if ($row["count"] == 0) { // Project $item is not in system.
+			array_push($errors, "Failure! Project {$item} is not in this system.");
 			$error_flag = -1;
+		}
+		else{ // Project $item is in system.
+			$sql = "DELETE FROM {$table_name} WHERE pro_id={$item}";
+			$results = mysqli_query($db_conn, $sql);
+			if (!$results) {
+				array_push($errors, "Failure! Meet problems when to delete project {$item}.");
+				$error_flag = -1;
+			}
 		}
 	}
 	return $error_flag;	
@@ -138,9 +152,9 @@ if(isset($_POST['bn_sbmt'])){
 			}
 			break;
 		case 'del_pro':
-			$del_pro_id = $_POST['$pro_id'];
+			$pro_id = $_POST['pro_id'];
 			// Delete existing project(s).
-			$r_val = delete_project($pro_id);	
+			$r_val = delete_project($db_conn, $pro_id);	
 			if ($r_val == -1){
 				mysqli_close($db_conn);
 				goto error_report;
