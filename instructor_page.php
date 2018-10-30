@@ -30,17 +30,17 @@
 				<input id="radio_del" type="radio" name="operation" value="del_pro" 
 				       onclick="del()"> Delet Project<br><br>
 				<div id="project_id" style="display: none">
-					Project #<br>  
+					Project ID<br>  
 					<input id="pro_id_input" type="text" name="pro_id"
 					value="<?php echo $pro_id; ?>"><br>
 				</div>
 				<div id="project_title"  style="display: none">
-					Title<br>
+					Project Title<br>
 					<input id="pro_title_input" type="text" name="pro_title"
 					 value="<?php echo $pro_title; ?>"><br>
 				</div>
 				<div id="project_requirement"  style="display: none">
-					Requirement<br>
+					Comment<br>
 					<input id="pro_requr_input" type="text" name="pro_requr"
 					 value="<?php echo $pro_requr; ?>"><br>
 				</div>
@@ -83,28 +83,37 @@
 
 	<script>
 		function add(){
+			// Store radio button choice.
 			sessionStorage.setItem("oprt_session_store", "radio_add_pro");
+			// Clear up project id, project title, project requirement input.
 			document.getElementById('pro_id_input').value    = '';	
 			document.getElementById('pro_title_input').value = '';			
 			document.getElementById('pro_requr_input').value = '';
+			// Set display attributes for project id, project title, project requirement.
 			document.getElementById('project_id').style.display    = 'none';
 			document.getElementById('project_title').style.display = 'block';
 			document.getElementById('project_requirement').style.display = 'block';
 		}
 		function modf(){
+			// Store radio button choice.
 			sessionStorage.setItem("oprt_session_store", "radio_mod_pro");
+			// Clear up project id, project title, project requirement input.
 			document.getElementById('pro_id_input').value    = '';	
 			document.getElementById('pro_title_input').value = '';			
 			document.getElementById('pro_requr_input').value = '';
+			// Set display attributes for project id, project title, project requirement.
 			document.getElementById('project_id').style.display    = 'block';
 			document.getElementById('project_title').style.display = 'block';
 			document.getElementById('project_requirement').style.display = 'block';
 		}
 		function del(){
+			// Store radio button choice.
 			sessionStorage.setItem("oprt_session_store", "radio_del_pro");
+			// Clear up project id, project title, project requirement input.
 			document.getElementById('pro_id_input').value    = '';	
 			document.getElementById('pro_title_input').value = '';			
 			document.getElementById('pro_requr_input').value = '';
+			// Set display attributes for project id, project title, project requirement.
 			document.getElementById('project_id').style.display    = 'block';
 			document.getElementById('project_title').style.display = 'none';
 			document.getElementById('project_requirement').style.display = 'none';
