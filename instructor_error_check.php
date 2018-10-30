@@ -13,11 +13,14 @@ $operation = "";
 $errors = array();
 
 
-function insert_new_project($db_conn, 
-							$pro_title, $pro_requr,
-							$fname, $lname){
+function insert_new_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
 	global $errors;
 	$table_name = "project";
+	// Check new project title.
+	if(empty($pro_title)){
+		array_push($errors, "Project title is empty.");
+		return -1;
+	}
 	// Insert data.		
 	$sql = "INSERT INTO {$table_name} (title, requirement, fname, lname) 
 	        VALUES('$pro_title', '$pro_requr', '$fname', '$lname')";
@@ -31,13 +34,17 @@ function insert_new_project($db_conn,
 }
 
 
-function modify_project($modf_pro_id, $modf_pro_title, 
-			            $modf_pro_sponsor, $modf_pro_requirement){
+function modify_project($modf_pro_id, $modf_pro_title, $modf_pro_sponsor, $modf_pro_requirement){
 	global $errors;
 	$table_name = "project";
-	// Check new project title.
+	// Check modified project id.
 	if(empty($modf_pro_id)){
-		array_push($errors, "Project # is empty.");
+		array_push($errors, "Project ID is empty.");
+		return -1;
+	}
+	// Check modified project title.
+	if(empty($modf_pro_title)){
+		array_push($errors, "Project title is empty.");
 		return -1;
 	}
 	// Search in database
@@ -73,12 +80,17 @@ function delete_project($db_conn, $fname, $lname, $del_pro_id){
 	global $errors, $pro_array;
 	$table_name = "project";
 	$error_flag = 0;
+	// Check deleted project id.
+	if(empty($del_pro_id)){
+		array_push($errors, "Project ID is empty.");
+		return -1;
+	}
 	// Analyze deleted items.
 	$pro_array = explode(",", $del_pro_id);	
 	$a = array();
 	foreach ($pro_array as $pro_item) {
 		if(intval($pro_item) == 0){
-			array_push($errors, "Project # must be integer(s) separated by comma ','.");
+			array_push($errors, "Project ID must be integer(s) separated by comma ','.");
 			return -1;
 		}
 		else{
@@ -130,7 +142,6 @@ function delete_project($db_conn, $fname, $lname, $del_pro_id){
 	}
 	return $error_flag;	
 }
-
 
 if(isset($_POST['bn_sbmt'])){
 	// Connect database.
@@ -194,5 +205,6 @@ if(isset($_POST['bn_sbmt'])){
 		echo "Successful operation!";		
 		echo "<br>";
 	}
+	echo "<br>";
 }
 ?>
