@@ -194,7 +194,8 @@ if(isset($_POST['bn_sbmt'])){
 		}
 	}
 	else{
-		echo "Successful operation!";
+		echo "Successful operation!";		
+		echo "<br>";
 	}
 }
 ?>
