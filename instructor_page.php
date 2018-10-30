@@ -14,7 +14,7 @@
 
 	<div class="split_left">
 		<div>
-			<form class="relative" method="post" action="instructor_page.php">
+			<form class="relative" method="post" action="instructor_page.php" autocomplete="off">
 				<?php include('instructor_error_check.php');?>
 				<!-- Input user information -->
 				First Name<br>
