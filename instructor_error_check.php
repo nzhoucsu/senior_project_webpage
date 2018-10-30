@@ -74,7 +74,6 @@ function delete_project($db_conn, $fname, $lname, $csuid, $del_pro_id){
 	global $errors, $pro_array;
 	$table_name = "project";
 	$error_flag = 0;
-	$sucess_item=array();
 	// Analyze deleted items.
 	$pro_array = explode(",", $del_pro_id);	
 	$a = array();
