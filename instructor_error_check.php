@@ -3,7 +3,6 @@
 // Variables are to store user id info.
 $fname = "";
 $lname = "";
-$csuid = "";
 // A variable is to store add_project, modify_project or delete_project.
 $pro_id = "";
 $pro_title = "";
@@ -16,12 +15,12 @@ $errors = array();
 
 function insert_new_project($db_conn, 
 							$pro_title, $pro_requr,
-							$fname, $lname, $csuid){
+							$fname, $lname){
 	global $errors;
 	$table_name = "project";
 	// Insert data.		
-	$sql = "INSERT INTO {$table_name} (title, requirement, fname, lname, csuid) 
-	        VALUES('$pro_title', '$pro_requr', '$fname', '$lname', '$csuid')";
+	$sql = "INSERT INTO {$table_name} (title, requirement, fname, lname) 
+	        VALUES('$pro_title', '$pro_requr', '$fname', '$lname')";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
 	    array_push($errors, "Failed to add project into database.");
@@ -70,7 +69,7 @@ function modify_project($modf_pro_id, $modf_pro_title,
 }
 
 
-function delete_project($db_conn, $fname, $lname, $csuid, $del_pro_id){
+function delete_project($db_conn, $fname, $lname, $del_pro_id){
 	global $errors, $pro_array;
 	$table_name = "project";
 	$error_flag = 0;
@@ -105,7 +104,7 @@ function delete_project($db_conn, $fname, $lname, $csuid, $del_pro_id){
 		}
 		// Check if current user is the author created this project.
 		// Only project's author can delete the project.
-		$sql = "SELECT fname, lname, csuid FROM {$table_name} WHERE pro_id={$item}";
+		$sql = "SELECT fname, lname FROM {$table_name} WHERE pro_id={$item}";
 		$results = mysqli_query($db_conn, $sql);
 		if (!$results) {
 			array_push($errors, "Failed to access author of deleted project {$item}.");
@@ -115,8 +114,7 @@ function delete_project($db_conn, $fname, $lname, $csuid, $del_pro_id){
 		$row=mysqli_fetch_assoc($results);
 		$strcmp_1 = strcmp(strtolower($row["fname"]), strtolower($fname));
 		$strcmp_2 = strcmp(strtolower($row["lname"]), strtolower($lname));
-		$strcmp_3 = strcmp(strtolower($row["csuid"]), strtolower($csuid));
-		if ($strcmp_1!=0 || $strcmp_2!=0 || $strcmp_3!=0){
+		if ($strcmp_1!=0 || $strcmp_2!=0){
 			array_push($errors, "Failure! You are not author of project {$item}.");
 			$error_flag = -1;
 			continue;
@@ -145,7 +143,6 @@ if(isset($_POST['bn_sbmt'])){
 	// Acquire user id info input.
 	$fname = $_POST['fname'];
 	$lname = $_POST['lname'];
-	$csuid = $_POST['csuid'];
 	
 	// Implement user's operation.
 	$operation = $_POST['operation'];
@@ -154,7 +151,7 @@ if(isset($_POST['bn_sbmt'])){
 			$pro_title = $_POST['pro_title'];
 			$pro_requr = $_POST['pro_requr'];
 			// Insert new project information into database.
-			$r_val = insert_new_project($db_conn, $pro_title, $pro_requr, $fname, $lname, $csuid);
+			$r_val = insert_new_project($db_conn, $pro_title, $pro_requr, $fname, $lname);
 			if ($r_val == -1){
 				mysqli_close($db_conn);
 				goto error_report;
@@ -174,7 +171,7 @@ if(isset($_POST['bn_sbmt'])){
 		case 'del_pro':
 			$pro_id = $_POST['pro_id'];
 			// Delete existing project(s).
-			$r_val = delete_project($db_conn, $fname, $lname, $csuid, $pro_id);	
+			$r_val = delete_project($db_conn, $fname, $lname, $pro_id);	
 			if ($r_val == -1){
 				mysqli_close($db_conn);
 				goto error_report;
