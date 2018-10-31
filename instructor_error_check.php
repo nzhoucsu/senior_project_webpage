@@ -79,6 +79,7 @@ function modify_project($modf_pro_id, $modf_pro_title, $modf_pro_sponsor, $modf_
 function delete_project($db_conn, $fname, $lname, $del_pro_id){
 	global $errors, $pro_array;
 	$table_name = "project";
+	$table_name_2 = "preference";
 	$error_flag = 0;
 	// Check deleted project id.
 	if(empty($del_pro_id)){
@@ -114,6 +115,20 @@ function delete_project($db_conn, $fname, $lname, $del_pro_id){
 			$error_flag = -1;
 			continue;
 		}
+		// Check if this project has been registered by students.
+		$sql = "SELECT COUNT(*) AS count FROM {$table_name_2} WHERE pro_id=$item";
+		$results = mysqli_query($db_conn, $sql);
+		if (!$results) {
+			array_push($errors, "Failed to access deleted project {$item}.");
+			$error_flag = -1;
+			continue;
+		}
+		$row=mysqli_fetch_assoc($results);
+		if ($row["count"] != 0) { 
+			array_push($errors, "Failure! Project {$item} has been enrolled by students.");
+			$error_flag = -1;
+			continue;
+		}
 		// Check if current user is the author created this project.
 		// Only project's author can delete the project.
 		$sql = "SELECT fname, lname FROM {$table_name} WHERE pro_id={$item}";
@@ -142,6 +157,7 @@ function delete_project($db_conn, $fname, $lname, $del_pro_id){
 	}
 	return $error_flag;	
 }
+
 
 if(isset($_POST['bn_sbmt'])){
 	// Connect database.
