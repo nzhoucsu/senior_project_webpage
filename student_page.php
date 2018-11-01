@@ -2,109 +2,85 @@
 <html>
 <title>Project List</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="css.css">
+<link rel="stylesheet" href="test.css">
 
-<head>
-    <style>
-    div.relative {
-        position: relative;
-        top: 30px;
-    }
-    </style>
+<head>    
+
 </head>
 
 <body>
 
-<div class="w3-third w3-container">
-	<form class="w3-container" method="post" action="20181025.php">
-        <?php include('error_check.php');?>
-		<p>
-        <label>First Name</label>
-		<input class="w3-input" type="text" name="fname" value="<?php echo $fname; ?>">
-		</p>
-		<p>
-        <label>Last Name</label>
-		<input class="w3-input" type="text" name="lname" value="<?php echo $lname; ?>">
-		</p>
-		<p>
-        <label>CSU ID</label>
-		<input class="w3-input" type="text" name="csuid" value="<?php echo $csuid; ?>">
-		</p>
-        <p>
-        <label>Project #</label>
-        <input class="w3-input" type="text" name="proid" value="<?php echo $proid; ?>">
-        </p>
-        <p><button class="w3-button w3-light-gray" type="submit" name="bn_sbmt">Submit</button></p>
-        <p><button class="w3-button w3-light-gray" type="submit" name="bn_update">Update</button></p>
-	</form>
-</div>
 
-<div class="w3-twothird w3-container">
-	<div class="w3-panel w3-gray">
-    <h2>PROJECT LIST</h2>
+    <div class="split_left">
+        <div>
+            <form class="relative" method="post" action="student_page.php" autocomplete="off">
+                <?php include('student_error_check.php');?>
+                <!-- Input user information -->
+                First Name<br>
+                <input type="text" name="fname" value="<?php echo $fname; ?>" required><br>
+                Last Name<br>
+                <input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
+                CSU ID<br>
+                <input type="text" name="csuid" value="<?php echo $csuid; ?>" required><br>
+                <h3>Enrollment Operation</h3>
+                <input id="radio_view" type="radio" name="operation" value="view"
+				       onclick="view()">View Enrollment<br>
+				<input id="radio_enrl" type="radio" name="operation" value="enrl" 
+				       onclick="enrl()">Enroll Project<br><br>
+				<div id="project_id" style="display: none">
+					Project ID<br>  
+					<input id="pro_id_input" type="text" name="proid"
+					value="<?php echo $proid; ?>"><br>
+				</div>
+				<div id="sbmt_bn" style="position: relative; top: 10px; display: none">
+                    <input type="submit" name="bn_sbmt" value="Submit">
+                </div> 
+				<script>
+					// This paragraph script for web page display when page refresh.
+					var choice = sessionStorage.getItem("oprt_session_store");
+					if(choice == 'radio_view'){
+						document.getElementById('radio_view').checked = true;
+						document.getElementById('project_id').style.display = 'none';
+						document.getElementById('sbmt_bn').style.display = 'block';
+					}
+					else if (choice == 'radio_enrl') {
+						document.getElementById('radio_enrl').checked = true;
+						document.getElementById('project_id').style.display = 'block';		
+						document.getElementById('sbmt_bn').style.display = 'block';
+					}
+				</script>                 
+            </form> 
+        </div>          
+    </div> 
+
+
+    <div class="split_right">
+        <div style="width: 98%; height: 600px; overflow: auto;">
+            <?php include('import_project_list.php');?>
+        </div>
     </div>
 
-    <table class="w3-table-all w3-hoverable">
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    	<tr>
-    		<td>
-    			<input type="checkbox" value="123">123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123
-    		</td>
-    	</tr>
-    </table>
-
-	
-</div>
-
+	<script>
+		function view(){
+			// Store radio button choice.
+			sessionStorage.setItem("oprt_session_store", "radio_view");
+			// Clear up project id.
+			document.getElementById('pro_id_input').value = '';
+			// Set display attributes for project id.
+			document.getElementById('project_id').style.display = 'none';
+			document.getElementById('sbmt_bn').style.display = 'block';
+		}
+		function enrl(){
+			// Store radio button choice.
+			sessionStorage.setItem("oprt_session_store", "radio_enrl");
+			// Clear up project id.
+			document.getElementById('pro_id_input').value = '';	
+			// Set display attributes for project id.
+			document.getElementById('project_id').style.display = 'block';
+			document.getElementById('sbmt_bn').style.display = 'block';
+		}	
+	</script>
 
 </body>
 </html>
