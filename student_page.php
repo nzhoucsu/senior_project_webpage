@@ -32,8 +32,14 @@
 					Project ID<br>  
 					<input id="pro_id_input" type="text" name="proid"
 					value="<?php echo $proid; ?>"><br>
+					<div style="font-size: 12px; position: relative; top: 5px">
+						Each student can only select five projects at most.<br>
+						Multiple project IDs should be separated by ",".<br>
+						Keep project ID blank to remove enrollment.<br>
+					</div>
+					
 				</div>
-				<div id="sbmt_bn" style="position: relative; top: 10px; display: none">
+				<div id="sbmt_bn" style="position: relative; top: 15px; display: none">
                     <input type="submit" name="bn_sbmt" value="Submit">
                 </div> 
 				<script>
