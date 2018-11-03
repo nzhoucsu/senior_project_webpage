@@ -13,6 +13,9 @@
 
 
     <div class="split_left">
+    	<div class="relative">
+    		<h3>Student Enrollment</h3>
+    	</div>
         <div>
             <form class="relative" method="post" action="student_page.php" autocomplete="off">
                 <?php include('student_error_check.php');?>
@@ -23,7 +26,7 @@
                 <input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
                 CSU ID<br>
                 <input type="text" name="csuid" value="<?php echo $csuid; ?>" required><br>
-                <h3>Enrollment Operation</h3>
+                <h4>Enrollment Operation</h4>
                 <input id="radio_view" type="radio" name="operation" value="view"
 				       onclick="view()">View Enrollment<br>
 				<input id="radio_enrl" type="radio" name="operation" value="enrl" 
@@ -57,7 +60,10 @@
 					}
 				</script>                 
             </form> 
-        </div>          
+        </div>
+        <div class="relative" style="top: 20px">
+        	<p><a href="http://localhost/instructor_page.php">Instructor Entrance</a></p>
+        </div>             
     </div> 
 
 
