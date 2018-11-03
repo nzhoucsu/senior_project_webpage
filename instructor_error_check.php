@@ -25,8 +25,8 @@ $pro_id_array = "";
 $operation = "";
 
 
-// Display database connection notice for user.
-function notice_for_operation($r_val){
+// Display general error notice for user.
+function notice_for_general($r_val){
 	if($r_val == FAILED) {
 		echo "<font color='red'>";
 		echo "Failed!<br>";
@@ -116,9 +116,7 @@ function add_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
 }
 
 
-function modify_project($db_conn, 
-						$pro_id, $pro_title, $pro_requr, 
-						$fname, $lname){
+function modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lname){
 	global $errors;
 	$table_name = "project";
 	// Check if input project id is valid.
@@ -153,7 +151,6 @@ function check_valid_proid($db_conn, $pro_id){
 	$sql = "SELECT COUNT(*)FROM {$table_name} WHERE pro_id=$pro_id";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
-	    array_push($errors, "Failed to valide proid in TABLE $table_name.");
 	    return FAILED;
 	}
 	$row = mysqli_fetch_array($results);
@@ -173,7 +170,6 @@ function check_valid_sponsor($db_conn, $pro_id, $fname, $lname){
 	$sql = "SELECT *FROM {$table_name} WHERE pro_id=$pro_id";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
-	    array_push($errors, "Failed to validate sponsor in TABLE {$table_name}.");
 	    return FAILED;
 	}
 	$row = mysqli_fetch_array($results);
@@ -207,7 +203,6 @@ function update_project($db_conn, $pro_id, $pro_title, $pro_requr){
 			WHERE pro_id=$pro_id";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
-	    array_push($errors, "Failed to update proinfo in TABLE $table_name.");
 	    return FAILED;
 	}
 	return SUCCESS;
@@ -244,9 +239,7 @@ if(isset($_POST['bn_sbmt'])){
 			$pro_title = $_POST['pro_title'];
 			$pro_requr = $_POST['pro_requr'];
 			// Modify an existing project.
-			$r_val = modify_project($db_conn, 
-									$pro_id, $pro_title, $pro_requr, 
-									$fname, $lname);	
+			$r_val = modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lname);	
 			break;
 		// case 'del_pro':
 		// 	$pro_id = $_POST['pro_id'];
@@ -267,7 +260,7 @@ if(isset($_POST['bn_sbmt'])){
 	notice_for_user:
 	switch ($operation) {
 		case '':
-			notice_for_operation($r_val);
+			notice_for_general($r_val);
 			break;
 		case 'add_pro':
 			notice_for_add($r_val);
