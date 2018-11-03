@@ -10,9 +10,10 @@
 </head>
 
 <body>
-
-
 	<div class="split_left">
+		<div class="relative">
+    		<h3>Project Registration</h3>
+    	</div>
 		<div>
 			<form class="relative" method="post" action="instructor_page.php" autocomplete="off">
 				<?php include('instructor_error_check.php');?>
@@ -22,7 +23,7 @@
 				Last Name<br>
 				<input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
 				<!-- Input project operation -->
-				<h3>Project Operation</h3>
+				<h4>Registration Operation</h4>
 				<input id="radio_add" type="radio" name="operation" value="add_pro" 
 				       onclick="add()"> Add Project<br>
 				<input id="radio_mod" type="radio" name="operation" value="mod_pro" 
@@ -70,7 +71,10 @@
 					<input type="submit" name="bn_sbmt" value="Submit">
 				</div>					
 			</form>	
-		</div>			
+		</div>
+		<div class="relative" style="top: 20px">
+        	<p><a href="http://localhost/student_page.php">Student Entrance</a></p>
+        </div>			
 	</div> 
 
 
