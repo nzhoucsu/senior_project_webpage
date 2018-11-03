@@ -1,5 +1,19 @@
 <?php
 
+
+define("FAILED", -1);
+define('SUCCESS', 0);
+
+// Constant variables used in function modify_project.
+define("INVALID_PROID",   1);
+define("VALID_PROID",     2);
+define("VALID_SPONSOR",   3);
+define("INVALID_SPONSOR", 4);
+define("VALID_TITLE",     5);
+define("INVALID_TITLE",   6);
+define("SUCCESS_MODF",    0);
+
+
 // Variables are to store user id info.
 $fname = "";
 $lname = "";
@@ -11,6 +25,38 @@ $pro_id_array = "";
 $operation = "";
 // A variable is to store error information.
 $errors = array();
+
+
+function notice_for_modf($r_val){
+	if ($r_val == INVALID_PROID) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Input project id is invailid.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == INVALID_SPONSOR) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "You are not the author of this project.<br>";
+		echo "<br></font>";
+	}elseif ($r_val == INVALID_TITLE) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Input project title is empty.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == FAILED) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Errors display in DEBUG OUTPUT.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == SUCCESS) {
+		echo "<font color='blue'>";
+		echo "Modification Successful!<br>";
+		echo "<br></font>";
+	}
+}
 
 
 function insert_new_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
@@ -34,45 +80,101 @@ function insert_new_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
 }
 
 
-function modify_project($modf_pro_id, $modf_pro_title, $modf_pro_sponsor, $modf_pro_requirement){
+function modify_project($db_conn, 
+						$pro_id, $pro_title, $pro_requr, 
+						$fname, $lname){
 	global $errors;
 	$table_name = "project";
-	// Check modified project id.
-	if(empty($modf_pro_id)){
-		array_push($errors, "Project ID is empty.");
-		return -1;
+	// Check if input project id is valid.
+	$r_val = check_valid_proid($db_conn, $pro_id);
+	if ($r_val != VALID_PROID) {
+		return $r_val;
 	}
-	// Check modified project title.
-	if(empty($modf_pro_title)){
-		array_push($errors, "Project title is empty.");
-		return -1;
+	// Check if input user is the author who registered this project.
+	$r_val = check_valid_sponsor($db_conn, $pro_id, $fname, $lname);
+	if ($r_val != VALID_SPONSOR) {
+		return $r_val;
 	}
-	// Search in database
-	$local_pro_id = intval($modf_pro_id);
-	$sql = "SELECT * FROM {$table_name} WHERE pro_id={$local_pro_id}";
+	// Check if project title is empty.
+	$r_val = check_valid_modfinfo($pro_title);
+	if ($r_val != VALID_TITLE) {
+		return $r_val;
+	}
+	// Update project modification.
+	$r_val = update_project($db_conn, $pro_id, $pro_title, $pro_requr);
+	return $r_val;
+}
+
+
+function check_valid_proid($db_conn, $pro_id){
+	global $errors;
+	$table_name = "project";
+	// Check if input project id is an integer.
+	if ((string)intval($pro_id) != $pro_id) {
+		return INVALID_PROID;
+	}
+	// Check if input project id is in TABLE project.
+	$sql = "SELECT COUNT(*)FROM {$table_name} WHERE pro_id=$pro_id";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
-	    array_push($errors, "Failed to access TABLE {$table_name} with project # {$modf_pro_id}.");
-		return -1;
+	    array_push($errors, "Failed to valide proid in TABLE $table_name.");
+	    return FAILED;
 	}
-	if($row = mysqli_fetch_array($results)){
-		$sql = "UPDATE {$table_name} 
-		        SET title={$modf_pro_title},
-		            sponsor={$modf_pro_sponsor},
-		            requirement={$modf_pro_requirement}
-		        WHERE pro_id={$local_pro_id}";
-		$results = mysqli_query($db_conn, $sql);
-		if (!$results) {
-		    array_push($errors, "Failed to update TABLE {$table_name} with project # {$modf_pro_id}.");
-			return -1;
-		}
+	$row = mysqli_fetch_array($results);
+	if ($row['COUNT(*)'] == 0) {
+		return INVALID_PROID;
 	}
 	else{
-		array_push($errors, "Failure! Project # {$modf_pro_id}is not in TABLE {$table_name}.");
-		return -1;
+		return VALID_PROID;
 	}
-	// Return success.
-	return 0;
+}
+
+
+function check_valid_sponsor($db_conn, $pro_id, $fname, $lname){
+	global $errors;
+	$table_name = "project";
+	// Check if current user is the author registered this project.
+	$sql = "SELECT *FROM {$table_name} WHERE pro_id=$pro_id";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    array_push($errors, "Failed to validate sponsor in TABLE {$table_name}.");
+	    return FAILED;
+	}
+	$row = mysqli_fetch_array($results);
+	$cmp_fname = strcmp(strtolower($row['fname']), strtolower($fname));
+	$cmp_lname = strcmp(strtolower($row['lname']), strtolower($lname));
+	if ($cmp_fname==0 && $cmp_lname==0) {
+		return VALID_SPONSOR;
+	}
+	else{
+		return INVALID_SPONSOR;
+	}
+}
+
+
+function check_valid_modfinfo($pro_title){
+	if (empty($pro_title)) {
+		return INVALID_TITLE;
+	}
+	else{
+		return VALID_TITLE;
+	}
+}
+
+
+function update_project($db_conn, $pro_id, $pro_title, $pro_requr){
+	global $errors;
+	$table_name = "project";
+	// Check if current user is the author registered this project.
+	$sql = "UPDATE {$table_name}
+			SET title='$pro_title', requirement='$pro_requr'
+			WHERE pro_id=$pro_id";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    array_push($errors, "Failed to update proinfo in TABLE $table_name.");
+	    return FAILED;
+	}
+	return SUCCESS_MODF;
 }
 
 
@@ -189,8 +291,10 @@ if(isset($_POST['bn_sbmt'])){
 			$pro_title = $_POST['pro_title'];
 			$pro_requr = $_POST['pro_requr'];
 			// Modify an existing project.
-			$r_val = modify_project($pro_id, $pro_title, $pro_requr);	
-			if ($r_val == -1){
+			$r_val = modify_project($db_conn, 
+									$pro_id, $pro_title, $pro_requr, 
+									$fname, $lname);	
+			if ($r_val == FAILED){
 				mysqli_close($db_conn);
 				goto error_report;
 			}
@@ -212,15 +316,26 @@ if(isset($_POST['bn_sbmt'])){
 
 	error_report:
 	if(count($errors)>0){
+		echo "<br> DEBUG OUPUT<br>";
 		foreach ($errors as $error) {
 			echo $error;
 			echo "<br>";
 		}
 	}
-	else{
-		echo "Successful operation!";		
-		echo "<br>";
+	// Display user notice information.
+	switch ($operation) {
+		case 'add_pro':
+			# code...
+			break;
+		case 'mod_pro':
+			notice_for_modf($r_val);
+			break;
+		case 'del_pro':
+			# code...
+			break;
+		default:
+			# code...
+			break;
 	}
-	echo "<br>";
 }
 ?>
