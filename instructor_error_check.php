@@ -3,8 +3,6 @@
 
 define("FAILED", -1);
 define('SUCCESS', 0);
-
-// Constant variables used in function modify_project.
 define("INVALID_PROID",   1);
 define("VALID_PROID",     2);
 define("VALID_SPONSOR",   3);
@@ -12,6 +10,7 @@ define("INVALID_SPONSOR", 4);
 define("VALID_TITLE",     5);
 define("INVALID_TITLE",   6);
 define("NO_RADIO_BUTTON_CHOICE", 7);
+define("STUDT_ENROL_PRO", 8);
 
 
 // Variables are to store user id info.
@@ -97,8 +96,34 @@ function notice_for_modf($r_val){
 }
 
 
+function notice_for_del($r_val){
+	if ($r_val == FAILED) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Fail to connect database.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == SUCCESS) {
+		echo "<font color='blue'>";
+		echo "Successfully delete a project!<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == STUDT_ENROL_PRO) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Students have enrolled this project.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == INVALID_SPONSOR) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "You are not the author of this project.<br>";
+		echo "<br></font>";
+	}
+}
+
+
 function add_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
-	global $errors;
 	$table_name = "project";
 	// Check new project title.
 	if(empty($pro_title)){
@@ -117,15 +142,13 @@ function add_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
 
 
 function modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lname){
-	global $errors;
-	$table_name = "project";
 	// Check if input project id is valid.
-	$r_val = check_valid_proid($db_conn, $pro_id);
+	$r_val = check_valid_proid($db_conn, $pro_id, 'project');
 	if ($r_val != VALID_PROID) {
 		return $r_val;
 	}
 	// Check if input user is the author who registered this project.
-	$r_val = check_valid_sponsor($db_conn, $pro_id, $fname, $lname);
+	$r_val = check_valid_sponsor($db_conn, $pro_id, $fname, $lname, 'project');
 	if ($r_val != VALID_SPONSOR) {
 		return $r_val;
 	}
@@ -135,14 +158,29 @@ function modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lnam
 		return $r_val;
 	}
 	// Update project modification.
-	$r_val = update_project($db_conn, $pro_id, $pro_title, $pro_requr);
+	$r_val = update_project($db_conn, $pro_id, $pro_title, $pro_requr, 'project');
 	return $r_val;
 }
 
 
-function check_valid_proid($db_conn, $pro_id){
-	global $errors;
-	$table_name = "project";
+function del_project($db_conn, $fname, $lname, $pro_id){
+	// Check if student(s) have enrolled this project.
+	$r_val = check_student_enroll_proid($db_conn, $pro_id, 'preference');
+	if ($r_val != SUCCESS) {
+		return $r_val;
+	}
+	// Check if current user is the project author.
+	$r_val = check_valid_sponsor($db_conn, $pro_id, $fname, $lname, 'project');	
+	if ($r_val != VALID_SPONSOR) {
+		return $r_val;
+	}
+	// Delete project.
+	$r_val = delete_project($db_conn, $pro_id, 'project');
+	return $r_val;
+}
+
+
+function check_valid_proid($db_conn, $pro_id, $table_name){
 	// Check if input project id is an integer.
 	if ((string)intval($pro_id) != $pro_id) {
 		return INVALID_PROID;
@@ -163,9 +201,7 @@ function check_valid_proid($db_conn, $pro_id){
 }
 
 
-function check_valid_sponsor($db_conn, $pro_id, $fname, $lname){
-	global $errors;
-	$table_name = "project";
+function check_valid_sponsor($db_conn, $pro_id, $fname, $lname, $table_name){
 	// Check if current user is the author registered this project.
 	$sql = "SELECT *FROM {$table_name} WHERE pro_id=$pro_id";
 	$results = mysqli_query($db_conn, $sql);
@@ -194,9 +230,7 @@ function check_valid_modfinfo($pro_title){
 }
 
 
-function update_project($db_conn, $pro_id, $pro_title, $pro_requr){
-	global $errors;
-	$table_name = "project";
+function update_project($db_conn, $pro_id, $pro_title, $pro_requr, $table_name){
 	// Check if current user is the author registered this project.
 	$sql = "UPDATE {$table_name}
 			SET title='$pro_title', requirement='$pro_requr'
@@ -206,6 +240,33 @@ function update_project($db_conn, $pro_id, $pro_title, $pro_requr){
 	    return FAILED;
 	}
 	return SUCCESS;
+}
+
+
+// Delete project.
+function delete_project($db_conn, $pro_id, $table_name){
+	$sql = "DELETE FROM {$table_name} WHERE pro_id=$pro_id";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
+	return SUCCESS;
+}
+
+// Check if student(s) have enrolled project.
+function check_student_enroll_proid($db_conn, $pro_id, $table_name){
+	$sql = "SELECT COUNT(*)FROM {$table_name} WHERE pro_id=$pro_id";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
+	$row = mysqli_fetch_array($results);
+	if ($row['COUNT(*)'] == 0) {
+		return SUCCESS;
+	}
+	else{
+		return STUDT_ENROL_PRO;
+	}
 }
 
 
@@ -241,15 +302,11 @@ if(isset($_POST['bn_sbmt'])){
 			// Modify an existing project.
 			$r_val = modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lname);	
 			break;
-		// case 'del_pro':
-		// 	$pro_id = $_POST['pro_id'];
-		// 	// Delete existing project(s).
-		// 	$r_val = delete_project($db_conn, $fname, $lname, $pro_id);	
-		// 	if ($r_val == -1){
-		// 		mysqli_close($db_conn);
-		// 		goto error_report;
-		// 	}
-		// 		break;
+		case 'del_pro':
+			$pro_id = $_POST['pro_id'];
+			// Delete existing project(s).
+			$r_val = del_project($db_conn, $fname, $lname, $pro_id);
+			break;
 		default:
 			break;
 	}
@@ -268,11 +325,10 @@ if(isset($_POST['bn_sbmt'])){
 		case 'mod_pro':
 			notice_for_modf($r_val);
 			break;
-		// case 'del_pro':
-		// 	# code...
-		// 	break;
+		case 'del_pro':
+			notice_for_del($r_val);
+			break;
 		default:
-			# code...
 			break;
 	}
 }
