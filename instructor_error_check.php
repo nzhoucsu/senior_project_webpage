@@ -97,7 +97,13 @@ function notice_for_modf($r_val){
 
 
 function notice_for_del($r_val){
-	if ($r_val == FAILED) {
+	if ($r_val == INVALID_PROID) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Deleted project id is invailid.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == FAILED) {
 		echo "<font color='red'>";
 		echo "Failed!<br>";
 		echo "Fail to connect database.<br>";
@@ -164,6 +170,11 @@ function modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lnam
 
 
 function del_project($db_conn, $fname, $lname, $pro_id){
+	// Check if input project id is valid.
+	$r_val = check_valid_proid($db_conn, $pro_id, 'project');
+	if ($r_val != VALID_PROID) {
+		return $r_val;
+	}
 	// Check if student(s) have enrolled this project.
 	$r_val = check_student_enroll_proid($db_conn, $pro_id, 'preference');
 	if ($r_val != SUCCESS) {
