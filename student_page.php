@@ -14,7 +14,38 @@
 
     <div class="split_left">
     	<div class="relative">
-    		<h3>Student Enrollment</h3>
+    		<div style="font-size: 22px"><b>Student Enrollment</b></div>
+    		<!-- Display deadline date -->
+			<?php
+				$db_conn = mysqli_connect('localhost', 'root', '0302', 'senior_project_db');
+				if (!$db_conn) {
+					echo "Failed to connect database.<br>";
+				}else{
+					$table_name = "deadline";
+					$sql = "SELECT COUNT(*)FROM {$table_name}";
+					$results = mysqli_query($db_conn, $sql);
+					if (!$results) {
+					    echo "Failed to connect database.<br>";
+					}
+					else{
+						$row = mysqli_fetch_array($results);
+						if ($row['COUNT(*)'] != 0) {
+							$sql = "SELECT *FROM {$table_name}";
+							$results = mysqli_query($db_conn, $sql);
+							if (!$results) {
+							    echo "Failed to connect database.<br>";
+							}
+							else{
+								$row = mysqli_fetch_array($results);
+								echo "Deadline: ";
+								echo $row['deadlinedate'];
+								echo "<br><br>";
+							}
+						}
+					}
+				}
+				mysqli_close($db_conn);						
+			?>
     	</div>
         <div>
             <form class="relative" method="post" action="student_page.php" autocomplete="off">
@@ -26,7 +57,9 @@
                 <input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
                 CSU ID<br>
                 <input type="text" name="csuid" value="<?php echo $csuid; ?>" required><br>
-                <h4>Enrollment Operation</h4>
+                <!-- <h4>Enrollment Operation</h4> -->
+                <p>   </p>
+                <div style="font-size: 18px"><b>Enrollment Operation</b></div>
                 <input id="radio_view" type="radio" name="operation" value="view"
 				       onclick="view()">View Enrollment<br>
 				<input id="radio_enrl" type="radio" name="operation" value="enrl" 
