@@ -57,7 +57,6 @@
                 <input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
                 CSU ID<br>
                 <input type="text" name="csuid" value="<?php echo $csuid; ?>" required><br>
-                <!-- <h4>Enrollment Operation</h4> -->
                 <p>   </p>
                 <div style="font-size: 18px"><b>Enrollment Operation</b></div>
                 <input id="radio_view" type="radio" name="operation" value="view"
