@@ -12,6 +12,7 @@ define("PROID_MORE_THAN_MAX", 9);
 define("NONEXISTING_STUDENT", 10);
 define("MISMATCHED_STUDENT",  11);
 define("CLEAR_ENROLLMENT",    12);
+define("OVER_DEADLINE",       15);
 
 $fname = "";
 $lname = "";
@@ -28,7 +29,7 @@ function notice_for_general($r_val){
 		echo "Fail to connect database.<br>";
 		echo "<br></font>";
 	}	
-	if ($r_val == NO_RADIO_BUTTON_CHOICE) {
+	elseif ($r_val == NO_RADIO_BUTTON_CHOICE) {
 		echo "<font color='red'>";
 		echo "Failed!<br>";
 		echo "Please select an operation.<br>";
@@ -116,6 +117,12 @@ function notice_for_enrl($r_val){
 		echo "This student should be in TABLE student, but not.<br>";
 		echo "<br></font>";
 	}
+	elseif ($r_val == OVER_DEADLINE) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Registration has done.<br>";
+		echo "<br></font>";
+	}
 }
 
 
@@ -130,6 +137,11 @@ function view_enrollment($db_conn, $fname, $lname, $csuid){
 
 
 function enrol_project($db_conn, $fname, $lname, $csuid, $proid){
+	// Check if current date is before deadline.
+	$r_val = check_valid_enrol_date($db_conn);	
+	if ($r_val != SUCCESS) {
+		return $r_val;
+	}
 	// Check if input proid is valid.
 	$r_val = check_valid_proid($db_conn, $proid);
 	if ($r_val != SUCCESS){
@@ -266,8 +278,9 @@ function update_enrollment($db_conn, $csuid, $proid){
 		return CLEAR_ENROLLMENT;
 	}
 	foreach ($pro_array as $pro_item) {	
-		$sql = "INSERT INTO {$table_name} (pro_id, csuid) 
-		VALUES('$pro_item', '$csuid')";
+		$enrl_date = date('Y/m/d');
+		$sql = "INSERT INTO {$table_name} (pro_id, csuid, enrl_date) 
+		VALUES('$pro_item', '$csuid', '$enrl_date')";
 		$results = mysqli_query($db_conn, $sql);
 		if (!$results) {
 		    return FAILED;
@@ -343,6 +356,36 @@ function check_valid_proid($db_conn, $proid){
 }
 
 
+function check_valid_enrol_date($db_conn){
+	$table_name = "deadline";
+	// Get current date.
+	$local_now = strtotime('now');
+	// Get deadline date.
+	$sql = "SELECT COUNT(*)FROM {$table_name}";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
+	$row = mysqli_fetch_array($results);
+	if ($row['COUNT(*)'] == 0) {
+		return SUCCESS;
+	}
+	$sql = "SELECT *FROM {$table_name}";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
+	$row = mysqli_fetch_array($results);
+	$local_deadline = strtotime($row['deadlinedate']."+1 day");
+	// Compare dates.
+	if ($local_now > $local_deadline) {
+		return OVER_DEADLINE;
+	}
+	// Return.
+	return SUCCESS;
+}
+
+
 if(isset($_POST['bn_sbmt'])){
 	$errors = array();
 	// Get user input.
@@ -356,7 +399,7 @@ if(isset($_POST['bn_sbmt'])){
 	if (!$db_conn) {
 		$r_val = FAILED;
 		goto notice_for_user;
-	}
+	}	
 	// Implement user's operation.
 	if (empty($operation)) {
 		$r_val = NO_RADIO_BUTTON_CHOICE;
