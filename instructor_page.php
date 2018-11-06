@@ -73,7 +73,8 @@
 			</form>	
 		</div>
 		<div class="relative" style="top: 20px">
-        	<p><a href="http://localhost/student_page.php">Student Entrance</a></p>
+        	<p><a href="http://localhost/student_page.php">Student Entrance</a></p>   
+        	<p><a href="http://localhost/admin_page.php">Admin Entrance</a></p>
         </div>			
 	</div> 
 

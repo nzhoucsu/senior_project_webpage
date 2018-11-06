@@ -63,6 +63,7 @@
         </div>
         <div class="relative" style="top: 20px">
         	<p><a href="http://localhost/instructor_page.php">Instructor Entrance</a></p>
+        	<p><a href="http://localhost/admin_page.php">Admin Entrance</a></p>
         </div>             
     </div> 
 
