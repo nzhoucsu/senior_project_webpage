@@ -15,7 +15,7 @@
     		<h3>Administration</h3>
     	</div>
 		<div>
-			<form class="relative" method="post" action="instructor_page.php" autocomplete="off">
+			<form class="relative" method="post" action="admin_page.php" autocomplete="off">
 				<?php include('admin_error_check.php');?>
 				<!-- Input user information -->
 				First Name<br>
@@ -34,11 +34,25 @@
 				       onclick="down()">Download enrollment<br>				
 				<div style="position: relative; top: 10px">
 					<input type="submit" name="bn_sbmt" value="Submit">
-				</div>					
+				</div>
+				<script>
+					// This paragraph script for web page display when page refresh.
+					var choice = sessionStorage.getItem("oprt_session_store");
+					if(choice == 'radio_deadln'){
+						document.getElementById('radio_deadln').checked = true;
+						document.getElementById('deadln').style.display = 'block';
+					}
+					else if (choice == 'radio_down') {
+						document.getElementById('radio_down').checked = true;
+						document.getElementById('deadln_input').value   = '';	
+						document.getElementById('deadln').style.display = 'none';
+					}
+				</script> 					
 			</form>	
 		</div>
 		<div class="relative" style="top: 20px">
         	<p><a href="http://localhost/student_page.php">Student Entrance</a></p>
+        	<p><a href="http://localhost/instructor_page.php">Instructor Enrutrance</a></p>
         </div>			
 	</div> 
 
@@ -52,10 +66,11 @@
 
 	<script>
 		function deadline(){
-			document.getElementById('deadln_input').value   = '';	
+			sessionStorage.setItem("oprt_session_store", "radio_deadln");
 			document.getElementById('deadln').style.display = 'block';
 		}
 		function down(){
+			sessionStorage.setItem("oprt_session_store", "radio_down");
 			document.getElementById('deadln_input').value   = '';	
 			document.getElementById('deadln').style.display = 'none';
 		}	
