@@ -100,6 +100,12 @@ function notice_for_modf($r_val){
 		echo "Successfully modify a project!<br>";
 		echo "<br></font>";
 	}
+	elseif ($r_val == STUDT_ENROL_PRO) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Students have enrolled this project.<br>";
+		echo "<br></font>";
+	}
 }
 
 
@@ -143,8 +149,9 @@ function add_project($db_conn, $pro_title, $pro_requr, $fname, $lname){
 		return INVALID_TITLE;
 	}
 	// Insert data.		
-	$sql = "INSERT INTO {$table_name} (title, requirement, fname, lname) 
-	        VALUES('$pro_title', '$pro_requr', '$fname', '$lname')";
+	$reg_date = date("Y/m/d");
+	$sql = "INSERT INTO {$table_name} (title, requirement, fname, lname, reg_date) 
+	        VALUES('$pro_title', '$pro_requr', '$fname', '$lname', '$reg_date')";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
 	    return FAILED;
@@ -168,6 +175,11 @@ function modify_project($db_conn, $pro_id, $pro_title, $pro_requr, $fname, $lnam
 	// Check if project title is empty.
 	$r_val = check_valid_modfinfo($pro_title);
 	if ($r_val != VALID_TITLE) {
+		return $r_val;
+	}
+	// Check if student(s) have enrolled this project.
+	$r_val = check_student_enroll_proid($db_conn, $pro_id, 'preference');
+	if ($r_val != SUCCESS) {
 		return $r_val;
 	}
 	// Update project modification.
@@ -250,8 +262,9 @@ function check_valid_modfinfo($pro_title){
 
 function update_project($db_conn, $pro_id, $pro_title, $pro_requr, $table_name){
 	// Check if current user is the author registered this project.
+	$reg_date = date("Y/m/d");
 	$sql = "UPDATE {$table_name}
-			SET title='$pro_title', requirement='$pro_requr'
+			SET title='$pro_title', requirement='$pro_requr', reg_date='$reg_date'
 			WHERE pro_id=$pro_id";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
