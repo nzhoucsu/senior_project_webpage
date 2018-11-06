@@ -54,7 +54,8 @@
 				Last Name<br>
 				<input type="text" name="lname" value="<?php echo $lname; ?>" required><br>
 				<!-- Input project operation -->
-				<h4>Registration Operation</h4>
+				<p>   </p>
+                <div style="font-size: 18px"><b>Registration Operation</b></div>
 				<input id="radio_add" type="radio" name="operation" value="add_pro" 
 				       onclick="add()"> Add Project<br>
 				<input id="radio_mod" type="radio" name="operation" value="mod_pro" 

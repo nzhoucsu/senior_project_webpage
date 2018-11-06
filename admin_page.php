@@ -12,7 +12,8 @@
 <body>
 	<div class="split_left">
 		<div class="relative">
-    		<h3>Administration</h3>
+    		<div style="font-size: 22px"><b>Administration</b></div>
+    		<p>   </p>
     	</div>
 		<div>
 			<form class="relative" method="post" action="admin_page.php" autocomplete="off">
@@ -29,6 +30,38 @@
 				<div id="deadln" style="display: none">
 					<input id="deadln_input" type="text" name="deadln"
 					value="<?php echo $deadln; ?>"><br>
+					<!-- Display deadline date -->
+					<?php
+						$db_conn = mysqli_connect('localhost', 'root', '0302', 'senior_project_db');
+						if (!$db_conn) {
+							echo "Failed to connect database.<br>";
+						}else{
+							$table_name = "deadline";
+							$sql = "SELECT COUNT(*)FROM {$table_name}";
+							$results = mysqli_query($db_conn, $sql);
+							if (!$results) {
+							    echo "Failed to connect database.<br>";
+							}
+							else{
+								$row = mysqli_fetch_array($results);
+								if ($row['COUNT(*)'] != 0) {
+									$sql = "SELECT *FROM {$table_name}";
+									$results = mysqli_query($db_conn, $sql);
+									if (!$results) {
+									    echo "Failed to connect database.<br>";
+									}
+									else{
+										$row = mysqli_fetch_array($results);
+										echo "<font size='2'>";
+										echo "Current deadline: ";
+										echo $row['deadlinedate'];
+										echo "<br></font>";
+									}
+								}
+							}
+						}
+						mysqli_close($db_conn);						
+					?>
 				</div>
 				<input id="radio_down" type="radio" name="operation" value="down" 
 				       onclick="down()">Download enrollment<br>				
