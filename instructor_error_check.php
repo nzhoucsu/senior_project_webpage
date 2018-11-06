@@ -11,6 +11,7 @@ define("VALID_TITLE",     5);
 define("INVALID_TITLE",   6);
 define("NO_RADIO_BUTTON_CHOICE", 7);
 define("STUDT_ENROL_PRO", 8);
+define("OVER_DEADLINE",   15);
 
 
 // Variables are to store user id info.
@@ -36,6 +37,12 @@ function notice_for_general($r_val){
 		echo "<font color='red'>";
 		echo "Failed!<br>";
 		echo "Please select an operation.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == OVER_DEADLINE) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Registration has done.<br>";
 		echo "<br></font>";
 	}
 }
@@ -281,6 +288,36 @@ function check_student_enroll_proid($db_conn, $pro_id, $table_name){
 }
 
 
+function check_valid_enrol_date($db_conn){
+	$table_name = "deadline";
+	// Get current date.
+	$local_now = strtotime('now');
+	// Get deadline date.
+	$sql = "SELECT COUNT(*)FROM {$table_name}";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
+	$row = mysqli_fetch_array($results);
+	if ($row['COUNT(*)'] == 0) {
+		return SUCCESS;
+	}
+	$sql = "SELECT *FROM {$table_name}";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
+	$row = mysqli_fetch_array($results);
+	$local_deadline = strtotime($row['deadlinedate']."+1 day");
+	// Compare dates.
+	if ($local_now > $local_deadline) {
+		return OVER_DEADLINE;
+	}
+	// Return.
+	return SUCCESS;
+}
+
+
 if(isset($_POST['bn_sbmt'])){
 	// Connect database.
 	$db_conn = mysqli_connect('localhost', 'root', '0302', 'senior_project_db');
@@ -288,11 +325,14 @@ if(isset($_POST['bn_sbmt'])){
 		$r_val = FAILED;
 		goto notice_for_user;
 	}
-	
+	// Check if current date is before deadline.
+	$r_val = check_valid_enrol_date($db_conn);
+	if ($r_val != SUCCESS) {
+		goto notice_for_user;
+	}	
 	// Acquire user id info input.
 	$fname = $_POST['fname'];
-	$lname = $_POST['lname'];
-	
+	$lname = $_POST['lname'];	
 	// Implement user's operation.
 	$operation = $_POST['operation'];
 	if (empty($operation)) {
