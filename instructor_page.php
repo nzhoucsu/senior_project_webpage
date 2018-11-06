@@ -13,6 +13,37 @@
 	<div class="split_left">
 		<div class="relative">
     		<h3>Project Registration</h3>
+    		<!-- Display deadline date -->
+			<?php
+				$db_conn = mysqli_connect('localhost', 'root', '0302', 'senior_project_db');
+				if (!$db_conn) {
+					echo "Failed to connect database.<br>";
+				}else{
+					$table_name = "deadline";
+					$sql = "SELECT COUNT(*)FROM {$table_name}";
+					$results = mysqli_query($db_conn, $sql);
+					if (!$results) {
+					    echo "Failed to connect database.<br>";
+					}
+					else{
+						$row = mysqli_fetch_array($results);
+						if ($row['COUNT(*)'] != 0) {
+							$sql = "SELECT *FROM {$table_name}";
+							$results = mysqli_query($db_conn, $sql);
+							if (!$results) {
+							    echo "Failed to connect database.<br>";
+							}
+							else{
+								$row = mysqli_fetch_array($results);
+								echo "Deadline: ";
+								echo $row['deadlinedate'];
+								echo "<br><br>";
+							}
+						}
+					}
+				}
+				mysqli_close($db_conn);						
+			?>
     	</div>
 		<div>
 			<form class="relative" method="post" action="instructor_page.php" autocomplete="off">
