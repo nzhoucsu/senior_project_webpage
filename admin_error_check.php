@@ -3,20 +3,59 @@
 
 define("FAILED", -1);
 define('SUCCESS', 0);
-define("INVALID_PROID",   1);
-define("VALID_PROID",     2);
-define("VALID_SPONSOR",   3);
-define("INVALID_SPONSOR", 4);
-define("VALID_TITLE",     5);
-define("INVALID_TITLE",   6);
 define("NO_RADIO_BUTTON_CHOICE", 7);
-define("STUDT_ENROL_PRO", 8);
+define("INVALID_DEADLINE_DATE",  13);
+define("INVALID_ADMIN",          14);
 
 
 $fname = "";
 $lname = "";
 $deadln = "";
 $operation = "";
+
+
+function notice_for_general($r_val){
+	if ($r_val == FAILED) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Fail to connect database.<br>";
+		echo "<br></font>";
+	}	
+	if ($r_val == NO_RADIO_BUTTON_CHOICE) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Please select an operation.<br>";
+		echo "<br></font>";
+	}	
+}
+
+
+// Deadline notice for user.
+function notice_for_deadline($r_val){
+	if ($r_val == FAILED) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Fail to connect database.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == SUCCESS) {
+		echo "<font color='blue'>";
+		echo "Successfully set a deadline date!<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == INVALID_ADMIN) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Wrong admin account.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == INVALID_DEADLINE_DATE) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Invalid deadline date.<br>";
+		echo "<br></font>";
+	}
+}
 
 
 function check_valid_deadline_date($deadln){
@@ -34,13 +73,13 @@ function check_valid_deadline_date($deadln){
 
 function check_valid_admin($db_conn, $fname, $lname){
 	$table_name = 'admin';
-	$sql = "SELECT COUNT(*)FROM {$table_name} WHERE fname=$fname AND lname=$lname";
+	$sql = "SELECT COUNT(*)FROM {$table_name} WHERE fname='$fname' AND lname='$lname'";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
 	    return FAILED;
 	}
 	$row = mysqli_fetch_array($results);
-	if ($row['COUNT(*)' == 0]) {
+	if ($row['COUNT(*)'] == 0) {
 		return INVALID_ADMIN;
 	}
 	return SUCCESS;
@@ -50,6 +89,10 @@ function check_valid_admin($db_conn, $fname, $lname){
 function update_deadline($db_conn, $deadln){
 	$table_name = 'deadline';
 	$sql = "DELETE FROM {$table_name}";
+	$results = mysqli_query($db_conn, $sql);
+	if (!$results) {
+	    return FAILED;
+	}
 	$sql = "INSERT INTO {$table_name} (deadlinedate) VALUES('$deadln')";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
@@ -64,11 +107,11 @@ function set_deadline_date($db_conn, $deadln, $fname, $lname){
 	if ($r_val != SUCCESS) {
 		return $r_val;
 	}
-	$r_Val = check_valid_admin($db_conn, $fname, $lname)
+	$r_val = check_valid_admin($db_conn, $fname, $lname);
 	if ($r_val != SUCCESS) {
 		return $r_val;
 	}
-	$r_Val = update_deadline($db_conn, $deadln);
+	$r_val = update_deadline($db_conn, $deadln);
 	if ($r_val != SUCCESS) {
 		return $r_val;
 	}
@@ -96,56 +139,28 @@ if(isset($_POST['bn_sbmt'])){
 		case 'deadln':
 			$r_val = set_deadline_date($db_conn, $deadln, $fname, $lname);
 			break;
-		case 'down':
-			# code...
-			break;
+		// case 'down':
+		// 	# code...
+		// 	break;
 		default:
 			# code...
 			break;
 	}
 
 
-
-	// Check if deadline date is valid.
-	$r_val = check_valid_deadline_date($deadln);
-	if ($r_val != SUCCESS) {
-		goto notice_for_user;
-	}
-	
-	
-	// Check if input user information is valid.
-	
-	$r_val = check_valid_admin($db_conn, $fname, $lname);
-	if (!$db_conn) {
-		$r_val = FAILED;
-		goto notice_for_user;
-	}
-
-
-
-
-
-
-
 	mysqli_close($db_conn);
 
-	// Display user notice information.
+	// // Display user notice information.
 	notice_for_user:
 	switch ($operation) {
 		case '':
 			notice_for_general($r_val);
 			break;
-		case 'add_pro':
-			notice_for_add($r_val);
+		case 'deadln':
+			notice_for_deadline($r_val);
 			break;
-		case 'mod_pro':
-			notice_for_modf($r_val);
-			break;
-		case 'del_pro':
-			notice_for_del($r_val);
-			break;
-		default:
-			break;
+	// 	default:
+	// 		break;
 	}
 }
 ?>
