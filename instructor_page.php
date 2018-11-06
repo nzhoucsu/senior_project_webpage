@@ -12,7 +12,7 @@
 <body>
 	<div class="split_left">
 		<div class="relative">
-    		<h3>Project Registration</h3>
+    		<div style="font-size: 22px"><b>Project Registration</b></div>
     		<!-- Display deadline date -->
 			<?php
 				$db_conn = mysqli_connect('localhost', 'root', '0302', 'senior_project_db');
