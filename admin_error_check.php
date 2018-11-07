@@ -6,6 +6,8 @@ define('SUCCESS', 0);
 define("NO_RADIO_BUTTON_CHOICE", 7);
 define("INVALID_DEADLINE_DATE",  13);
 define("INVALID_ADMIN",          14);
+define("NO_ENROLLMENT", value);
+define("SYSERROR_NO_STUDENT", value);
 
 
 $fname = "";
@@ -125,6 +127,30 @@ function download_enrollment($db_conn){
 	if (!$proid_set) {
 	    return FAILED;
 	}
+	if (mysqli_num_rows($proid_set) > 0) {
+		return down_operation($db_conn, $proid_set);
+	}
+	else{
+		return NO_ENROLLMENT;
+	}
+}
+
+function down_operation($db_conn, $proid_set){
+	// Set table header.
+	$output .= '
+		<table class="table" bordered="1">
+			<tr>
+				<th>Project_ID</th>
+				<th>Title</th>
+				<th>Sponsor</th>
+				<th>Requirement</th>
+				<th>Student</th>
+				<th>CSU_ID</th>
+				<th>Major_1</th>
+				<th>Major_2</th>
+				<th>Enrl_Date</th>
+			</tr>';
+	// Set table content.
 	while ($proid_row = mysqli_fetch_array($proid_set)) {
 		$cur_proid = $proid_row['pro_id'];
 		$sql = "SELECT project.pro_id AS Project_ID, 
@@ -146,17 +172,40 @@ function download_enrollment($db_conn){
 		if (!$stdt_set) {
 		    return FAILED;
 		}
-		while ($stdt_row = mysqli_fetch_array($stdt_set)) {
-			$Project_ID  = $stdt_row['Project_ID'];
-			$Title      = $stdt_row['Title'];
-			$Sponsor    = $stdt_row['spnsfname']." ".$stdt_row['spnslname'];
-			$Requirement = $stdt_row['Requirement'];
-			$Student    = $stdt_row['stdtfname']." ".$stdt_row['stdtlname'];
-			$CSU_ID     = $stdt_row['CSU_ID'];
-			$Major      = $stdt_row['mj1']."    ".$stdt_row['mj2'];
-			$Enrollment_Date = $stdt_row['Enrl_Date'];
+		if (mysqli_num_rows($stdt_set) > 0) {
+			while ($stdt_row = mysqli_fetch_array($stdt_set)) {
+				$Project_ID  = $stdt_row['Project_ID'];
+				$Title      = $stdt_row['Title'];
+				$Sponsor    = $stdt_row['spnsfname']." ".$stdt_row['spnslname'];
+				$Requirement = $stdt_row['Requirement'];
+				$Student    = $stdt_row['stdtfname']." ".$stdt_row['stdtlname'];
+				$CSU_ID     = $stdt_row['CSU_ID'];
+				$Major1     = $stdt_row['mj1'];
+				$Major2     = $stdt_row['mj2'];
+				$Enrollment_Date = $stdt_row['Enrl_Date'];
+				$output .= '
+					<tr>
+						<td>'.$Project_ID.'</td>
+						<td>'.$Title.'</td>
+						<td>'.$Sponsor.'</td>
+						<td>'.$Requirement.'</td>
+						<td>'.$Student.'</td>
+						<td>'.$CSU_ID.'</td>
+						<td>'.$Major1.'</td>
+						<td>'.$Major2.'</td>
+						<td>'.$Enrollment_Date.'</td>
+					</tr>
+				';
+			}			
+		}
+		else{
+			return SYSERROR_NO_STUDENT;
 		}		
 	}
+	$output .= '</table>';
+	header("Content-Type: application/vnd.ms-excel");
+	header("Content-Disposition: attacment; filename=SenrPrjtEnrl.xls");
+	echo $output;
 }
 
 
