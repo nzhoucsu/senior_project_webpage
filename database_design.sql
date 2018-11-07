@@ -22,17 +22,32 @@ CREATE TABLE instructor(
 CREATE TABLE project (
     pro_id			INT 			NOT NULL AUTO_INCREMENT,
     title			varchar(200)    NOT NULL,
-    sponsor			varchar(60)    	NOT NULL,
+    fname			varchar(30)    	NOT NULL,
+    lname			varchar(30)    	NOT NULL,
+    csuid    		varchar(7)    	NOT NULL,
     requirement		varchar(100)    DEFAULT NULL,
-    enrl_deadline	varchar(20)    	DEFAULT NULL,
+    reg_date		varchar(10)    	DEFAULT NULL,
 
     PRIMARY KEY(pro_id)
 );
 
 CREATE TABLE preference(
-    pro_id	INT   		NOT NULL,
-    csuid  	varchar(7) 	NOT NULL,
+    pro_id		INT   		NOT NULL,
+    csuid  		varchar(7) 	NOT NULL,
+    enrl_date	varchar(10)    	DEFAULT NULL,
 
     FOREIGN KEY(pro_id) REFERENCES project(pro_id),
     FOREIGN KEY(csuid) REFERENCES student(csuid)
 );
+
+CREATE TABLE deadline(
+    deadlinedate	varchar(10)    	DEFAULT NULL,
+);
+
+CREATE TABLE admin(
+    fname			varchar(30)    	NOT NULL,
+    lname			varchar(30)    	NOT NULL,
+    csuid    		varchar(7)    	DEFAULT NULL,
+);
+
+INSERT INTO admin (fname, lname) VALUES('Yongjian', 'Fu');
