@@ -64,6 +64,10 @@
 				<input id="radio_enrl" type="radio" name="operation" value="enrl" 
 				       onclick="enrl()">Enroll Project<br><br>
 				<div id="project_id" style="display: none">
+					Major 1<br>
+	                <input id="mj1" type="text" name="major1" value="<?php echo $major1; ?>"><br>
+	                Major 2<br>
+	                <input id="mj2" type="text" name="major2" value="<?php echo $major2; ?>"><br>
 					Project ID<br>  
 					<input id="pro_id_input" type="text" name="proid"
 					value="<?php echo $proid; ?>"><br>
@@ -72,9 +76,8 @@
 						Multiple project IDs should be separated by ",".<br>
 						Keep project ID blank to remove enrollment.<br>
 					</div>
-					
 				</div>
-				<div id="sbmt_bn" style="position: relative; top: 15px; display: none">
+				<div id="sbmt_bn" style="position: relative; top: 5px; display: none">
                     <input type="submit" name="bn_sbmt" value="Submit">
                 </div> 
 				<script>
@@ -87,7 +90,7 @@
 					}
 					else if (choice == 'radio_enrl') {
 						document.getElementById('radio_enrl').checked = true;
-						document.getElementById('project_id').style.display = 'block';		
+						document.getElementById('project_id').style.display = 'block';
 						document.getElementById('sbmt_bn').style.display = 'block';
 					}
 				</script>                 
@@ -110,8 +113,10 @@
 		function view(){
 			// Store radio button choice.
 			sessionStorage.setItem("oprt_session_store", "radio_view");
-			// Clear up project id.
+			// Clear up.
 			document.getElementById('pro_id_input').value = '';
+			document.getElementById('mj1').value = '';
+			document.getElementById('mj2').value = '';
 			// Set display attributes for project id.
 			document.getElementById('project_id').style.display = 'none';
 			document.getElementById('sbmt_bn').style.display = 'block';
@@ -119,8 +124,10 @@
 		function enrl(){
 			// Store radio button choice.
 			sessionStorage.setItem("oprt_session_store", "radio_enrl");
-			// Clear up project id.
-			document.getElementById('pro_id_input').value = '';	
+			// Clear up.
+			document.getElementById('pro_id_input').value = '';				
+			document.getElementById('mj1').value = '';
+			document.getElementById('mj2').value = '';
 			// Set display attributes for project id.
 			document.getElementById('project_id').style.display = 'block';
 			document.getElementById('sbmt_bn').style.display = 'block';

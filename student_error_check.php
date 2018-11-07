@@ -17,6 +17,8 @@ define("OVER_DEADLINE",       15);
 $fname = "";
 $lname = "";
 $csuid = "";
+$major1= "";
+$major2= "";
 $proid = "";
 $pro_array = "";
 $enroll_project = array();
@@ -136,7 +138,7 @@ function view_enrollment($db_conn, $fname, $lname, $csuid){
 }
 
 
-function enrol_project($db_conn, $fname, $lname, $csuid, $proid){
+function enrol_project($db_conn, $fname, $lname, $csuid, $major1, $major2, $proid){
 	// Check if current date is before deadline.
 	$r_val = check_valid_enrol_date($db_conn);	
 	if ($r_val != SUCCESS) {
@@ -156,7 +158,7 @@ function enrol_project($db_conn, $fname, $lname, $csuid, $proid){
 		return $r_val;
 	}
 	elseif ($r_val == NONEXISTING_STUDENT) {
-		$r_val = add_student($db_conn, $fname, $lname, $csuid);
+		$r_val = add_student($db_conn, $fname, $lname, $csuid, $major1, $major2);
 		if ($r_val == FAILED){
 			return $r_val;
 		}
@@ -228,10 +230,10 @@ function acquire_enrollment($db_conn, $csuid){
 }
 
 
-function add_student($db_conn, $fname, $lname, $csuid){
+function add_student($db_conn, $fname, $lname, $csuid, $major1, $major2){
 	$table_name = "student";
-	$sql = "INSERT INTO {$table_name} (fname, lname, csuid)
-			VALUES ('$fname', '$lname', '$csuid')";
+	$sql = "INSERT INTO {$table_name} (fname, lname, csuid, major1, major2)
+			VALUES ('$fname', '$lname', '$csuid', '$major1', '$major2')";
 	$results = mysqli_query($db_conn, $sql);
 	if (!$results) {
 		return FAILED;
@@ -392,6 +394,8 @@ if(isset($_POST['bn_sbmt'])){
 	$fname = $_POST['fname'];
 	$lname = $_POST['lname'];
 	$csuid = $_POST['csuid'];
+	$major1= $_POST['major1']; 
+	$major2= $_POST['major2'];
 	$proid = $_POST['proid'];
 	$operation = $_POST['operation'];
 	//Connect database.	
@@ -411,7 +415,7 @@ if(isset($_POST['bn_sbmt'])){
 			$r_val = view_enrollment($db_conn, $fname, $lname, $csuid);
 			break;		
 		case 'enrl':
-			$r_val = enrol_project($db_conn, $fname, $lname, $csuid, $proid);
+			$r_val = enrol_project($db_conn, $fname, $lname, $csuid, $major1, $major2, $proid);
 			break;
 		default:
 			break;
