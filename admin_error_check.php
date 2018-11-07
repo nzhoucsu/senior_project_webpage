@@ -6,8 +6,8 @@ define('SUCCESS', 0);
 define("NO_RADIO_BUTTON_CHOICE", 7);
 define("INVALID_DEADLINE_DATE",  13);
 define("INVALID_ADMIN",          14);
-define("NO_ENROLLMENT", value);
-define("SYSERROR_NO_STUDENT", value);
+define("NO_ENROLLMENT", 16);
+define("SYSERROR_NO_STUDENT", 17);
 
 
 $fname = "";
@@ -32,7 +32,6 @@ function notice_for_general($r_val){
 }
 
 
-// Deadline notice for user.
 function notice_for_deadline($r_val){
 	if ($r_val == FAILED) {
 		echo "<font color='red'>";
@@ -55,6 +54,27 @@ function notice_for_deadline($r_val){
 		echo "<font color='red'>";
 		echo "Failed!<br>";
 		echo "Invalid deadline date.<br>";
+		echo "<br></font>";
+	}
+}
+
+
+function notice_for_download($r_val){
+	if ($r_val == FAILED) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Fail to connect database.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == NO_ENROLLMENT) {
+		echo "<font color='blue'>";
+		echo "No student enrolls any project.<br>";
+		echo "<br></font>";
+	}
+	elseif ($r_val == INVALID_ADMIN) {
+		echo "<font color='red'>";
+		echo "Failed!<br>";
+		echo "Wrong admin account.<br>";
 		echo "<br></font>";
 	}
 }
@@ -121,91 +141,25 @@ function set_deadline_date($db_conn, $deadln, $fname, $lname){
 }
 
 
-function download_enrollment($db_conn){
+function download_enrollment($db_conn, $fname, $lname){
+	$r_val = check_valid_admin($db_conn, $fname, $lname);
+	echo $r_val;
+	echo "<br>";
+	if ($r_val != SUCCESS) {
+		return $r_val;
+	}
 	$sql = "SELECT DISTINCT pro_id FROM preference";
 	$proid_set = mysqli_query($db_conn, $sql);
 	if (!$proid_set) {
 	    return FAILED;
 	}
 	if (mysqli_num_rows($proid_set) > 0) {
-		return down_operation($db_conn, $proid_set);
+
+		header("Location:download.php");
 	}
 	else{
 		return NO_ENROLLMENT;
-	}
-}
-
-function down_operation($db_conn, $proid_set){
-	// Set table header.
-	$output .= '
-		<table class="table" bordered="1">
-			<tr>
-				<th>Project_ID</th>
-				<th>Title</th>
-				<th>Sponsor</th>
-				<th>Requirement</th>
-				<th>Student</th>
-				<th>CSU_ID</th>
-				<th>Major_1</th>
-				<th>Major_2</th>
-				<th>Enrl_Date</th>
-			</tr>';
-	// Set table content.
-	while ($proid_row = mysqli_fetch_array($proid_set)) {
-		$cur_proid = $proid_row['pro_id'];
-		$sql = "SELECT project.pro_id AS Project_ID, 
-					   project.title AS Title, 
-					   project.fname AS spnsfname,
-					   project.lname AS spnslname, 
-					   project.requirement AS Requirement,
-					   student.fname AS stdtfname, 
-					   student.lname AS stdtlname,
-					   student.csuid AS CSU_ID, 
-					   student.major1 AS mj1, 
-					   student.major2 AS mj2,
-					   preference.enrl_date AS Enrl_Date
-				FROM preference, project, student
-				WHERE preference.pro_id=$cur_proid AND
-					  project.pro_id=preference.pro_id AND
-					  student.csuid=preference.csuid";
-		$stdt_set = mysqli_query($db_conn, $sql);
-		if (!$stdt_set) {
-		    return FAILED;
-		}
-		if (mysqli_num_rows($stdt_set) > 0) {
-			while ($stdt_row = mysqli_fetch_array($stdt_set)) {
-				$Project_ID  = $stdt_row['Project_ID'];
-				$Title      = $stdt_row['Title'];
-				$Sponsor    = $stdt_row['spnsfname']." ".$stdt_row['spnslname'];
-				$Requirement = $stdt_row['Requirement'];
-				$Student    = $stdt_row['stdtfname']." ".$stdt_row['stdtlname'];
-				$CSU_ID     = $stdt_row['CSU_ID'];
-				$Major1     = $stdt_row['mj1'];
-				$Major2     = $stdt_row['mj2'];
-				$Enrollment_Date = $stdt_row['Enrl_Date'];
-				$output .= '
-					<tr>
-						<td>'.$Project_ID.'</td>
-						<td>'.$Title.'</td>
-						<td>'.$Sponsor.'</td>
-						<td>'.$Requirement.'</td>
-						<td>'.$Student.'</td>
-						<td>'.$CSU_ID.'</td>
-						<td>'.$Major1.'</td>
-						<td>'.$Major2.'</td>
-						<td>'.$Enrollment_Date.'</td>
-					</tr>
-				';
-			}			
-		}
-		else{
-			return SYSERROR_NO_STUDENT;
-		}		
-	}
-	$output .= '</table>';
-	header("Content-Type: application/vnd.ms-excel");
-	header("Content-Disposition: attacment; filename=SenrPrjtEnrl.xls");
-	echo $output;
+	}	
 }
 
 
@@ -231,7 +185,7 @@ if(isset($_POST['bn_sbmt'])){
 			$r_val = set_deadline_date($db_conn, $deadln, $fname, $lname);
 			break;
 		case 'down':
-			$r_val = download_enrollment($db_conn);
+			$r_val = download_enrollment($db_conn, $fname, $lname);
 			break;
 		default:
 			# code...
@@ -249,6 +203,9 @@ if(isset($_POST['bn_sbmt'])){
 			break;
 		case 'deadln':
 			notice_for_deadline($r_val);
+			break;
+		case 'down':
+			notice_for_download($r_val);
 			break;
 	// 	default:
 	// 		break;
