@@ -118,6 +118,48 @@ function set_deadline_date($db_conn, $deadln, $fname, $lname){
 	return SUCCESS;
 }
 
+
+function download_enrollment($db_conn){
+	$sql = "SELECT DISTINCT pro_id FROM preference";
+	$proid_set = mysqli_query($db_conn, $sql);
+	if (!$proid_set) {
+	    return FAILED;
+	}
+	while ($proid_row = mysqli_fetch_array($proid_set)) {
+		$cur_proid = $proid_row['pro_id'];
+		$sql = "SELECT project.pro_id AS Project_ID, 
+					   project.title AS Title, 
+					   project.fname AS spnsfname,
+					   project.lname AS spnslname, 
+					   project.requirement AS Requirement,
+					   student.fname AS stdtfname, 
+					   student.lname AS stdtlname,
+					   student.csuid AS CSU_ID, 
+					   student.major1 AS mj1, 
+					   student.major2 AS mj2,
+					   preference.enrl_date AS Enrl_Date
+				FROM preference, project, student
+				WHERE preference.pro_id=$cur_proid AND
+					  project.pro_id=preference.pro_id AND
+					  student.csuid=preference.csuid";
+		$stdt_set = mysqli_query($db_conn, $sql);
+		if (!$stdt_set) {
+		    return FAILED;
+		}
+		while ($stdt_row = mysqli_fetch_array($stdt_set)) {
+			$Project_ID  = $stdt_row['Project_ID'];
+			$Title      = $stdt_row['Title'];
+			$Sponsor    = $stdt_row['spnsfname']." ".$stdt_row['spnslname'];
+			$Requirement = $stdt_row['Requirement'];
+			$Student    = $stdt_row['stdtfname']." ".$stdt_row['stdtlname'];
+			$CSU_ID     = $stdt_row['CSU_ID'];
+			$Major      = $stdt_row['mj1']."    ".$stdt_row['mj2'];
+			$Enrollment_Date = $stdt_row['Enrl_Date'];
+		}		
+	}
+}
+
+
 if(isset($_POST['bn_sbmt'])){
 	$fname = $_POST['fname'];
 	$lname = $_POST['lname'];
@@ -139,9 +181,9 @@ if(isset($_POST['bn_sbmt'])){
 		case 'deadln':
 			$r_val = set_deadline_date($db_conn, $deadln, $fname, $lname);
 			break;
-		// case 'down':
-		// 	# code...
-		// 	break;
+		case 'down':
+			$r_val = download_enrollment($db_conn);
+			break;
 		default:
 			# code...
 			break;
