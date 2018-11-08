@@ -48,5 +48,8 @@ while ($proid_row = mysqli_fetch_array($proid_set)){
 		}			
 	}
 }
+//Disconnect database;
+mysqli_close($db_conn);
+
 fclose($output) or die("Can't close php://output");
 ?>
